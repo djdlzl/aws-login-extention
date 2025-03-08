@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MSP 로그인 툴</title>
+  <link href="styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="all.min.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="search-section">
+        <input type="text" id="searchInput" placeholder="계정 검색 (이름 또는 계정 번호)">
+        <button class="add-btn" title="계정 추가"><i class="fas fa-plus"></i></button>
+        <button class="delete-btn" title="선택 삭제"><i class="fas fa-trash"></i></button>
+        <button class="upload-btn" title="데이터 업로드"><i class="fas fa-upload"></i></button>
+        <input type="file" id="dataUpload" accept=".json" style="display: none;">
+      </div>
+    </div>
+    <ul class="list-group"></ul>
+  </div>
+  <div id="notification" class="notification"></div>
+  <div id="addModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h3>새 계정 추가</h3>
+      <input type="text" id="addName" placeholder="계정명">
+      <input type="text" id="addAccount" placeholder="계정 ID">
+      <input type="text" id="addUsername" placeholder="사용자 아이디">
+      <input type="text" id="addPassword" placeholder="비밀번호">
+      <input type="text" id="addMfaSecret" placeholder="MFA 비밀키">
+      <button id="saveNewClient">저장</button>
+      <button id="closeModal">닫기</button>
+    </div>
+  </div>
+  <script src="popup.bundle.js"></script>
+</body>
+</html>
