@@ -1,4 +1,5 @@
 const otplib = require('otplib');
+const jsQR = require('jsqr'); // QR 코드 인식 라이브러리
 
 console.log('popup.js 실행 시작');
 
@@ -29,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const addModal = document.getElementById('addModal');
   const saveNewClient = document.getElementById('saveNewClient');
   const closeModal = document.getElementById('closeModal');
+  const qrUploadButton = document.getElementById('uploadQrBtn');
+  const qrFileInput = document.getElementById('qrUpload');
 
   if (uploadButton && fileInput) {
     uploadButton.addEventListener('click', () => fileInput.click());
@@ -53,6 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (deleteButton) {
     deleteButton.addEventListener('click', toggleDeleteMode);
+  }
+
+  if (qrUploadButton && qrFileInput) {
+    qrUploadButton.addEventListener('click', () => qrFileInput.click());
+    qrFileInput.addEventListener('change', handleQrUpload);
   }
 
   loadClients();
@@ -294,8 +302,46 @@ function deleteSelectedClients() {
     const encodedData = encodeToBase64(JSON.stringify(clients));
     chrome.storage.local.set({ encodedClients: encodedData }, () => {
       deleteMode = false;
-      document.getElementById('searchInput').value = ''; // 검색창 초기화
+      document.getElementById('searchInput').value = '';
       loadClients();
     });
   });
+}
+
+function handleQrUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const imageData = ctx.getImageData(0, 0, img.width, img.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height);
+      
+      if (code) {
+        const mfaSecret = extractMfaSecret(code.data); // QR 데이터에서 비밀키 추출
+        if (mfaSecret) {
+          document.getElementById('addMfaSecret').value = mfaSecret;
+        } else {
+          alert('QR 코드에서 MFA 비밀키를 추출할 수 없습니다.');
+        }
+      } else {
+        alert('QR 코드를 인식할 수 없습니다.');
+      }
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function extractMfaSecret(qrData) {
+  // QR 데이터는 보통 otpauth://totp/... 형식
+  const match = qrData.match(/secret=([A-Za-z0-9]+)/);
+  return match ? match[1] : null;
 }

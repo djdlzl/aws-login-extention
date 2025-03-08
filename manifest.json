@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "MSP Login Tool",
-  "version": "1.71",
+  "name": "AWS Login Tool",
+  "version": "1.0",
   "description": "AWS 로그인 및 MFA 관리 도구",
   "permissions": [
     "storage",

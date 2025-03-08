@@ -28,7 +28,11 @@
       <input type="text" id="addAccount" placeholder="계정 ID">
       <input type="text" id="addUsername" placeholder="사용자 아이디">
       <input type="text" id="addPassword" placeholder="비밀번호">
-      <input type="text" id="addMfaSecret" placeholder="MFA 비밀키">
+      <div class="mfa-input">
+        <input type="text" id="addMfaSecret" placeholder="MFA 비밀키">
+        <button id="uploadQrBtn" title="QR 코드 업로드"><i class="fas fa-qrcode"></i></button>
+        <input type="file" id="qrUpload" accept="image/*" style="display: none;">
+      </div>
       <button id="saveNewClient">저장</button>
       <button id="closeModal">닫기</button>
     </div>
