@@ -1,13 +1,21 @@
 /* 기존 스타일 유지, 변경 부분만 업데이트 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
 .container {
-  width: 350px;
-  padding: 10px;
+  width: 400px; /* 창 크기 확장 */
+  min-height: 500px; /* 충분한 높이 확보 */
+  padding: 15px;
+  box-sizing: border-box;
 }
 
 .search-section {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 #searchInput {
@@ -46,6 +54,8 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  max-height: 400px; /* 스크롤 가능하도록 높이 설정 */
+  overflow-y: auto;
 }
 
 .list-group-item {
@@ -217,7 +227,7 @@
   background: white;
   padding: 20px;
   border-radius: 4px;
-  width: 300px;
+  width: 350px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
@@ -245,7 +255,7 @@
   padding: 5px;
   height: 32px;
   border: 1px solid #ccc;
-  border-right: none; /* 버튼과 붙이기 위해 오른쪽 테두리 제거 */
+  border-right: none;
   border-radius: 4px 0 0 4px;
   font-size: 14px;
   box-sizing: border-box;
@@ -256,7 +266,7 @@
   height: 32px;
   padding: 0;
   border: 1px solid #ccc;
-  border-left: none; /* 입력란과 붙이기 */
+  border-left: none;
   border-radius: 0 4px 4px 0;
   background: #f0f0f0;
   cursor: pointer;
@@ -278,4 +288,65 @@
   background: #f0f0f0;
   border-radius: 4px;
   cursor: pointer;
+}
+
+#passwordModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+#passwordModal .modal-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 4px;
+  width: 250px; /* 가로 길이 확장 */
+  min-height: 100px; /* 세로 길이 확장 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#passwordModal h3 {
+  margin: 0 0 15px;
+  font-size: 18px;
+}
+
+#passwordModal input {
+  width: 100%; /* 가로 길이 확장 */
+  padding: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+
+#passwordModal button {
+  padding: 8px 15px;
+  margin-right: 10px;
+  border: none;
+  background: #f0f0f0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#passwordModal button:last-child {
+  margin-right: 0;
+}
+
+#passwordModal .button-group {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
 }
