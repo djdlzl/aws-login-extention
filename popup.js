@@ -57,12 +57,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const addButton = document.querySelector('.add-btn');
   const deleteButton = document.querySelector('.delete-btn');
   const addModal = document.getElementById('addModal');
-  const saveNewClientBtn = document.getElementById('saveNewClient'); // 버튼 요소
-  const closeModalBtn = document.getElementById('closeModal'); // 버튼 요소
+  const saveNewClientBtn = document.getElementById('saveNewClient');
+  const closeModalBtn = document.getElementById('closeModal');
   const qrUploadButton = document.getElementById('uploadQrBtn');
   const qrFileInput = document.getElementById('qrUpload');
 
-  // 요소 존재 여부 확인
   if (!passwordModal) {
     console.error('passwordModal 요소를 찾을 수 없습니다.');
     return;
@@ -202,7 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 새 계정 추가 모달 버튼 이벤트
   saveNewClientBtn.addEventListener('click', () => {
     console.log('saveNewClientBtn 클릭');
     saveNewClientHandler();
@@ -213,7 +211,6 @@ document.addEventListener('DOMContentLoaded', () => {
     addModal.style.display = 'none';
   });
 
-  // 초기 실행: 세션 및 데이터 확인
   chrome.storage.local.get(['session', 'encodedClients', 'salt'], (result) => {
     const session = result.session;
     const hasData = !!result.encodedClients;
@@ -224,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (session && session.password && session.passwordSetTimestamp && session.hashedPassword) {
       const now = Date.now();
       const sessionAge = now - session.passwordSetTimestamp;
-      const sessionDuration = 5000;
+      const sessionDuration = 9 * 60 * 60 * 1000;
 
       console.log('세션 상태:', { now, passwordSetTimestamp: session.passwordSetTimestamp, sessionAge, sessionDuration });
 
@@ -263,7 +260,7 @@ function loadClients(searchQuery = '') {
     if (session && session.password && session.passwordSetTimestamp && session.hashedPassword) {
       const now = Date.now();
       const sessionAge = now - session.passwordSetTimestamp;
-      const sessionDuration = 24 * 60 * 60 * 1000;
+      const sessionDuration = 9 * 60 * 60 * 1000;
 
       console.log('loadClients - 세션 상태:', { now, passwordSetTimestamp: session.passwordSetTimestamp, sessionAge, sessionDuration });
 
@@ -317,49 +314,64 @@ function loadClients(searchQuery = '') {
         console.log('loadClients - 저장된 데이터 없음, 빈 목록 표시');
       }
 
+      // 검색어로 필터링
+      if (searchQuery) {
+        clients = clients.filter(client =>
+          client.name.toLowerCase().includes(searchQuery) ||
+          client.account.toLowerCase().includes(searchQuery)
+        );
+        console.log('필터링된 클라이언트:', clients);
+      }
+
       const list = document.querySelector('.list-group');
       if (!list) {
         console.error('loadClients - list-group 요소를 찾을 수 없습니다.');
         return;
       }
-      list.innerHTML = clients.map(client => `
-        <li class="list-group-item">
-          <div class="row row-name">
-            <div class="col col-checkbox" style="display: ${deleteMode ? 'block' : 'none'};">
-              <input type="checkbox" class="delete-checkbox" data-account="${client.account}">
-            </div>
-            <div class="col col-name" data-account="${client.account}" data-field="name">
-              <i class="fas fa-user-shield"></i>
-              <span>${client.name}</span>
-              <input type="text" value="${client.name}" style="display: none;">
-            </div>
-            <div class="col col-account" data-account="${client.account}" data-field="account">
-              <span>${client.account}</span>
-              <input type="text" value="${client.account}" style="display: none;">
-            </div>
-          </div>
-          <div class="row row-details">
-            <div class="col col-credentials">
-              <div class="credential-item" data-account="${client.account}" data-field="username">
-                <span>${client.username}</span>
-                <input type="text" value="${client.username}" style="display: none;">
+
+      // 검색 결과가 없을 경우 메시지 표시
+      if (clients.length === 0) {
+        list.innerHTML = '<li class="list-group-item">검색 결과가 없습니다.</li>';
+      } else {
+        list.innerHTML = clients.map(client => `
+          <li class="list-group-item">
+            <div class="row row-name">
+              <div class="col col-checkbox" style="display: ${deleteMode ? 'block' : 'none'};">
+                <input type="checkbox" class="delete-checkbox" data-account="${client.account}">
               </div>
-              <div class="credential-item" data-account="${client.account}" data-field="password">
-                <span>••••••••</span>
-                <input type="text" value="${client.password}" style="display: none;">
+              <div class="col col-name" data-account="${client.account}" data-field="name">
+                <i class="fas fa-user-shield"></i>
+                <span>${client.name}</span>
+                <input type="text" value="${client.name}" style="display: none;">
+              </div>
+              <div class="col col-account" data-account="${client.account}" data-field="account">
+                <span>${client.account}</span>
+                <input type="text" value="${client.account}" style="display: none;">
               </div>
             </div>
-            <div class="col col-mfa">
-              <button class="btn-mfa" data-mfa="${client.mfaSecret}">MFA</button>
+            <div class="row row-details">
+              <div class="col col-credentials">
+                <div class="credential-item" data-account="${client.account}" data-field="username">
+                  <span>${client.username}</span>
+                  <input type="text" value="${client.username}" style="display: none;">
+                </div>
+                <div class="credential-item" data-account="${client.account}" data-field="password">
+                  <span>••••••••</span>
+                  <input type="text" value="${client.password}" style="display: none;">
+                </div>
+              </div>
+              <div class="col col-mfa">
+                <button class="btn-mfa" data-mfa="${client.mfaSecret}">MFA</button>
+              </div>
+              <div class="col col-login">
+                <button class="btn-login" data-name="${client.name}" data-account="${client.account}" data-username="${client.username}" data-password="${client.password}" data-mfa="${client.mfaSecret}">
+                  <i class="fas fa-sign-in-alt"></i>
+                </button>
+              </div>
             </div>
-            <div class="col col-login">
-              <button class="btn-login" data-name="${client.name}" data-account="${client.account}" data-username="${client.username}" data-password="${client.password}" data-mfa="${client.mfaSecret}">
-                <i class="fas fa-sign-in-alt"></i>
-              </button>
-            </div>
-          </div>
-        </li>
-      `).join('');
+          </li>
+        `).join('');
+      }
 
       document.querySelectorAll('[data-field]').forEach(column => {
         column.addEventListener('click', (e) => editField(e.currentTarget, column.dataset.account, column.dataset.field));
@@ -620,4 +632,69 @@ function handleAddButtonClick() {
     deleteMode = false;
     loadClients();
   }
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'login') {
+    const { name, account, username, password, mfaSecret } = message.data;
+
+    const loginUrl = `https://${account}.signin.aws.amazon.com/console`;
+    chrome.tabs.create({ url: loginUrl }, (tab) => {
+      chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+        if (tabId === tab.id && changeInfo.status === 'complete') {
+          chrome.tabs.onUpdated.removeListener(listener);
+
+          const otplib = require('otplib');
+          const mfaCode = otplib.authenticator.generate(mfaSecret);
+
+          setTimeout(() => {
+            chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: autoLogin,
+              args: [username, password, mfaCode]
+            }, (results) => {
+              if (chrome.runtime.lastError) {
+                console.error('스크립트 삽입 오류:', chrome.runtime.lastError);
+              } else {
+                console.log('스크립트 삽입 성공');
+              }
+            });
+          }, 1000);
+        }
+      });
+    });
+  }
+});
+
+function autoLogin(username, password, mfaCode) {
+  const attemptLogin = () => {
+    const usernameField = document.querySelector('#username');
+    const passwordField = document.querySelector('#password');
+    const signInButton = document.querySelector('#signin_button');
+
+    if (usernameField && passwordField && signInButton) {
+      usernameField.value = username;
+      usernameField.dispatchEvent(new Event('input', { bubbles: true }));
+      passwordField.value = password;
+      passwordField.dispatchEvent(new Event('input', { bubbles: true }));
+      signInButton.click();
+
+      setTimeout(() => {
+        const mfaField = document.querySelector('#mfaCode');
+        const submitButton = document.querySelector('button[type="submit"]') || document.querySelector('#signin_button');
+        if (mfaField && submitButton) {
+          mfaField.value = mfaCode;
+          mfaField.dispatchEvent(new Event('input', { bubbles: true }));
+          submitButton.click();
+        } else {
+          console.error('MFA 필드 또는 제출 버튼을 찾을 수 없음');
+        }
+      }, 500);
+    } else {
+      console.error('로그인 필드를 찾을 수 없음');
+      setTimeout(attemptLogin, 500);
+    }
+  };
+
+  attemptLogin();
 }
