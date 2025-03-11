@@ -1,0 +1,18 @@
+{
+    "clients": [
+      {
+        "name": "Example Account",
+        "account": "123456789012",
+        "username": "user@example.com",
+        "password": "securepassword123",
+        "mfaSecret": "ABCDEFGHIJKLMNOP"
+      },
+      {
+        "name": "Another Account",
+        "account": "987654321098",
+        "username": "another@example.com",
+        "password": "anotherpassword456",
+        "mfaSecret": "ZYXWVUTSRQPONM"
+      }
+    ]
+  }

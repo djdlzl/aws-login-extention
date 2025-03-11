@@ -30,7 +30,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: 'node_modules/@fortawesome/fontawesome-free/css/all.min.css', to: 'all.min.css' },
-        { from: 'node_modules/@fortawesome/fontawesome-free/webfonts', to: 'webfonts' }, // 폰트 복사
+        { from: 'node_modules/@fortawesome/fontawesome-free/webfonts', to: 'webfonts' },
         { from: 'popup.html', to: 'popup.html' },
         { from: 'styles.css', to: 'styles.css' },
         { from: 'manifest.json', to: 'manifest.json' },
